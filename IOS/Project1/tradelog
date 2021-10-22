@@ -1,0 +1,319 @@
+#!/bin/sh
+
+export POSIXLY_CORRECT=yes
+export LC_NUMERIC=en_US.UTF-8
+
+print_help()
+{
+    echo "Usage: tradelog [-h|--help]"
+    echo "       tradelog [FILTER] [COMMAND] [LOG [LOG2 [...]]"
+    echo ""
+    echo "  list-tick     "
+    echo "  profit        "
+    echo "  pos           "
+    echo "  last-price    "
+    echo "  hist-ord      "
+    echo "  graph-pos     "
+    echo ""
+    echo "  -a DATETIME   "
+    echo "  -b DATETIME   "
+    echo "  -t TICKER     "
+    echo "  -w WIDTH      "
+    echo ""
+}
+
+ticker_F()
+{   
+    OUT=$(echo "$INPUT" | \
+        awk \
+        -F ';' \
+        -v tickers="$TICKER" \
+        '{
+            ticker= ""$2""
+            if (tickers ~ ticker) {
+                print $0
+            }
+        }')
+}
+
+list_tick_F()
+{
+    LIST_TICK_OUT=$(echo "$F_INPUT" | \
+        awk \
+        -F ';' \
+        '{ print $2 }' |sort|uniq)
+     echo "$LIST_TICK_OUT"
+}
+
+after()
+{
+    OUT=$(echo "$INPUT" | \
+        awk \
+        -F ';' \
+        -v date_time="$DATETIME" \
+        '{
+            if($1 > date_time) {
+                print $0
+            }
+        }')
+}
+
+before()
+{
+    OUT=$(echo "$INPUT" | \
+        awk \
+        -F ';' \
+        -v date_time="$DATETIME" \
+        '{
+            if($1 < date_time) {
+                print $0
+            }
+        }')
+}
+
+profit_F()
+{
+    PROFIT_OUT=$(echo "$F_INPUT" | \
+        awk \
+        -F ';' \
+        '{
+            if ($3 == "sell"){
+                sell = sell + ($4*$6)
+            }
+            if  ($3 == "buy"){
+                buy = buy + ($4*$6)
+            }
+        } END {
+            profit = sell - buy
+            OFMT="%.2f"
+            print profit
+        }')
+    echo "$PROFIT_OUT"
+}
+
+pos_F()
+{
+    POS_OUT=$(echo "$F_INPUT" | sort -t ';' -k2,2 | \
+        awk \
+        -F ';' \
+        -v ticker="0" \
+        -v last_date="0" \
+        '{
+            if (ticker == 0){
+                ticker=$2
+            }
+            if (ticker == $2){
+                if ($3 == "sell"){
+                    sell=sell + $6
+                }
+                if ($3 == "buy"){
+                    buy=buy + $6
+                }
+                if ($1 > last_date){
+                    last_date = $1
+                    jed_cena = $4
+                }
+                pos = (buy - sell )* jed_cena
+                pos = sprintf("%.2f", pos)
+                printf ("%-5s %5s %11s\n", $2, ":", pos)
+            } 
+            if (ticker != $2) {
+                ticker="0"
+                sell="0"
+                buy="0"
+                last_date = "0"
+                jed_cena = "0"
+                if ($3 == "buy"){
+                    buy=buy + $6
+                }
+                if ($3 == "sell"){
+                    sell=sell + $6
+                }
+            }
+        }' |tac | sort -uk1,1)
+    echo "$POS_OUT"| sort -t ':' -rnk2
+}
+
+last_price_F()
+{   
+    longest_price=$(echo "$F_INPUT" | \
+    awk \
+    -F ';' \
+    '{
+        price = $4
+        if(length(price) > longest_price){
+            longest_price = length(price)
+        }
+    } END {
+        print longest_price
+    }')
+    LAST_PRICE_OUT=$(echo "$F_INPUT" | sort -t ';' -rk2,2 | \
+        awk \
+        -F ';' \
+        -v lp="$longest_price" \
+        '{
+            printf("%-5s %5s %*s\n", $2, ":", lp, $4)
+        }' | uniq -w5 | sort)
+    echo "$LAST_PRICE_OUT"
+}
+
+hist_ord_F()
+{
+    HIST_ORD_OUT=$(echo "$F_INPUT" | sort -t ';' -k2,2 | \
+        awk \
+        -F ';' \
+        -v ticker="0" \
+        -v num="0" \
+        -v i="0" \
+        -v graph="" \
+        '{
+            if (ticker == 0){
+                ticker=$2
+            }
+            if (ticker == $2){
+                ++num
+                for (i; i<(num); ++i){
+                    graph = graph"#"
+                }
+                printf("%-5s %5s %s\n", $2, ":", graph)
+            } 
+            if (ticker != $2) {
+                ticker="0"
+                num="0"
+                i="0"
+                graph=""
+                ++num
+                for (i; i<=num; ++i){
+                    graph = graph"#"
+                }
+            }
+        }'|tac | sort -uk1,1)
+    echo "$HIST_ORD_OUT"
+}
+
+COMMAND='0'
+FILTER="0"
+LOG_FILES=""
+
+
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in 
+    -h | --help)
+        print_help
+        exit 0
+        ;;
+    *.gz)
+        INPUT=$(gzip -d -c $1) 
+        shift
+        ;;
+    *.log)
+        INPUT=$(cat "$1")
+        shift
+        ;;
+    -w)
+        if [ "$WIDTH" = "" ]; then
+            WIDTH="$2"
+            if [ "$WIDTH" -lt 0 ]; then
+                echo "ERROR : INCORRECT INPUT : -w must be positive number"
+                exit 0
+            fi
+            shift 2
+        else 
+            echo "ERROR : INCCORRECT INPUT : TOO MANY FILTERS -w"
+            exit 0
+        fi
+        ;;
+    -a | -b)
+        FILTER="$1"
+        DATETIME="$2"
+        shift 2
+        ;;
+    list-tick | profit | pos | last-price | hist-ord | graph-pos)
+        if [ "$COMMAND" = 0 ]; then
+            COMMAND="$1"
+            shift
+        else 
+            echo "INCCORRECT INPUT : TOO MANY COMMANDS"
+            exit 0
+        fi
+        ;;
+    -t)
+        FILTER="$1"
+        TICKER="$2$TICKER"
+        shift 2
+        ;;
+    esac
+done
+
+if [ "$INPUT" = "" ]; then
+    INPUT=$(cat)
+fi 
+
+ 
+
+if [ "$FILTER" != "0" ]; then
+    case "$FILTER" in
+    -t)
+        ticker_F
+        if [ "$COMMAND" = "0" ]; then
+            echo "$OUT"
+        fi
+        ;;
+    -a)
+        after
+        if [ "$COMMAND" = "0" ]; then
+            echo "$OUT"
+        fi
+        ;;
+    -b)
+        before
+        if [ "$COMMAND" = "0" ]; then
+            echo "$OUT"
+        fi
+        ;;
+    esac
+fi
+
+
+if [ "$COMMAND" != "0" ]; then
+    if [ "$FILTER" = "0" ]; then 
+        F_INPUT="$INPUT"
+    else
+        F_INPUT="$OUT"
+    fi
+    case "$COMMAND" in
+    list-tick)
+        list_tick_F
+        break
+        ;;
+    profit)
+        profit_F
+        break
+        ;;
+    pos)
+        pos_F
+        break
+        ;;
+    last-price)
+        last_price_F
+        break
+        ;;
+    hist-ord)
+        hist_ord_F
+        break
+        ;;
+    graph-pos)
+        #todo
+        ;;
+    esac
+fi
+
+if [ "$COMMAND" = "0" ] && [ "$FILTER" = "0" ]; then
+    echo "$INPUT"
+fi
+
+
+
+
+
