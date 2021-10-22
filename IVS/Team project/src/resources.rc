@@ -1,0 +1,6 @@
+#ifndef _resource_rc
+#define _resource_rc
+
+MAINICON ICON "BERRY.ico"
+
+#endif // _resource_rc

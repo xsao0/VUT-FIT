@@ -1,0 +1,4 @@
+xhusar11  100 	(Gui design, Gui implementacia,)
+xzalez01  100 	(Funkcia + a !, Instalator, Gui vypomoc)
+xmakai00  100 	(Funkcia *, %, 1/x, /, Mocnina, Dokument8cia, Doxy)
+xjesko01  100   (testy, CMakeList, Funkcia - a Odmocnina)
