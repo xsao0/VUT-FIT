@@ -1,0 +1,19 @@
+﻿<views:UserControlBase x:Class="xDrive.App.Views.MyGarageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:views="clr-namespace:xDrive.App.Views"
+             xmlns:viewModels="clr-namespace:xDrive.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:MyGarageViewModel}"
+             d:DesignHeight="400" d:DesignWidth="830">
+    <Grid Visibility="{Binding Visibility, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="230"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <views:CarDetailView Grid.Row="0" DataContext="{Binding CarDetailViewModel}"/>
+        <views:CarListView Grid.Row="1" DataContext="{Binding UserDetailViewModel}" />
+    </Grid>
+</views:UserControlBase>

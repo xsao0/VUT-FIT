@@ -1,0 +1,41 @@
+﻿<views:UserControlBase x:Class="xDrive.App.Views.RouteListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:views="clr-namespace:xDrive.App.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignData UserDetailViewModel}"
+             d:DesignHeight="400" d:DesignWidth="1000">
+    <Grid Background="White">
+        <ListBox Grid.Row="1" ItemsSource="{Binding Model.PlannedRoutesAsDriver}" HorizontalContentAlignment="Stretch" Foreground="{x:Null}" x:Name="RouteListBox">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Background="#FFB992FF">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Content="Datum a čas:" HorizontalAlignment="Right"/>
+                            <Label Grid.Row="0" Grid.Column="1" Content="{Binding Beginning}" />
+                            <Label Grid.Row="1" Grid.Column="0" Content="Start:" HorizontalAlignment="Right"/>
+                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding Start}" HorizontalAlignment="Left" />
+                            <Label Grid.Row="2" Grid.Column="0" Content="Cíl:" HorizontalAlignment="Right"/>
+                            <Label Grid.Row="2" Grid.Column="1" Content="{Binding Finish}" HorizontalAlignment="Left" />
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</views:UserControlBase>

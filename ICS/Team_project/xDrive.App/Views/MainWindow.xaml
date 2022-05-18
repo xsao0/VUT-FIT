@@ -1,0 +1,56 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:xDrive.App.ViewModels"
+        xmlns:views="clr-namespace:xDrive.App.Views"
+        x:Class="xDrive.App.Views.MainWindow"
+        Title="xDrive"
+        Width="1200"
+        Height="550"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type viewModels:MainViewModel}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch" Background="Black" OpacityMask="Black">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="175" />
+                <ColumnDefinition Width="28*" />
+                <ColumnDefinition Width="102" />
+                <ColumnDefinition Width="115" />
+                <ColumnDefinition Width="147" />
+                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="69"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="64
+                                  "/>
+                <ColumnDefinition Width="59*" />
+                <ColumnDefinition Width="175"/>
+            </Grid.ColumnDefinitions>
+            <Image Source="/Views/xD.jpg" HorizontalAlignment="Center" Width="100"/>
+            <TextBlock Grid.Column="1" Foreground="White" FontSize="40" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontFamily="Courier New" Margin="10,0,0,0" FontWeight="Normal" Height="45" Width="144"><Run Text="x"/><Bold><Run Text="Drive"/></Bold></TextBlock>
+            <Button Grid.Column="3" Content="Najít cestu" Command="{Binding UpdateViewCommand}" CommandParameter="Search" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="102" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" />
+            <Button Grid.Column="4" Content="Vytvořit jízdu" Command="{Binding UpdateViewCommand}" CommandParameter="CreateRoute" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="115" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" />
+            <Button Grid.Column="5" Content="Vytvořit uživatele" Command="{Binding UpdateViewCommand}" CommandParameter="CreateUser" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="147" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" OpacityMask="White" />
+            <Button Grid.Column="6" Content="Profil" Command="{Binding UpdateViewCommand}" CommandParameter="MyProfile" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="75" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" />
+            <Button Grid.Column="7" Content="Garáž" Command="{Binding UpdateViewCommand}" CommandParameter="MyGarage" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="69" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" />
+            <Button Grid.Column="8" Content="Místenky" Command="{Binding UpdateViewCommand}" CommandParameter="MySeatReservation" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="90" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" />
+            <Button Grid.Column="9" Content="Jízdy" Command="{Binding UpdateViewCommand}" CommandParameter="MyTickets" HorizontalAlignment="Center" Height="45" VerticalAlignment="Top" Width="64" Foreground="White" BorderBrush="White" BorderThickness="1,1,1,0" Margin="0,55,0,0" />
+
+            <views:UserListView Grid.Column="11" VerticalAlignment="Center" DataContext="{Binding UserListViewModel}" Height="100" Margin="0,0,5,0" />
+        </Grid>
+        <views:SearchView Grid.Row="1" DataContext="{Binding SearchViewModel}" />
+        <views:CreateRouteView Grid.Row="1" DataContext="{Binding CreateRouteViewModel}" />
+        <views:CreateUserView Grid.Row="1" DataContext="{Binding CreateUserViewModel}"/>
+        <views:MyProfileView Grid.Row="1" DataContext="{Binding MyProfileViewModel}"/>
+        <views:MyGarageView Grid.Row="1" DataContext="{Binding MyGarageViewModel}" />
+        <views:MySeatReservationView Grid.Row="1" DataContext="{Binding MySeatReservationViewModel}" />
+        <views:MyTicketsView Grid.Row="1" DataContext="{Binding MyTicketsViewModel}" />
+        <!-- TODO views for SeatReservations and Routes -->
+    </Grid>
+</Window>
